@@ -149,7 +149,7 @@ namespace WpfApp1
         }
         private void inputPass()
         {
-            if (this.passkeyWin.IsActive) return;
+            if (this.passkeyWin != null && this.passkeyWin.IsActive) return;
             this.passkeyWin = new Window2();
             this.passkeyWin.Show();
             this.passkeyWin.passkeyButt.Click += PasskeyButt_Click;
@@ -273,7 +273,9 @@ namespace WpfApp1
             var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(Keysize / 8).Take(Keysize / 8).ToArray();
             // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
             var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((Keysize / 8) * 2)).ToArray();
-
+            
+            try
+            {
             using (var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations))
             {
                 var keyBytes = password.GetBytes(Keysize / 8);
@@ -296,7 +298,12 @@ namespace WpfApp1
                 }
             }
         }
-
+        }
+        catch (Exception e)
+        {
+             return "";
+        }
+        
         private static byte[] Generate256BitsOfRandomEntropy()
         {
             var randomBytes = new byte[32]; // 32 Bytes will give us 256 bits.
